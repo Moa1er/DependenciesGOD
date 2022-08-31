@@ -5,6 +5,10 @@
 
 #include "filesmanager.h"
 
+//useful here for mainwindow.h
+#define COLOR_PROJECT_FILE "#FF00FF"
+#define COLOR_EXTERNAL_FILE "#808000"
+
 class DepenManager
 {
 public:
@@ -12,6 +16,7 @@ public:
     void buildTree();
 public:
     DepenNode* treeOfDepen;
+    QHash<QString, DepenNode*> tmpDepenNodes_;
 private:
     void makeDepen(DepenNode* node);
     void regroupExternalDepen(DepenNode* node);
@@ -25,7 +30,6 @@ private:
 private:
     FilesManager* filesManager_;
     QHash<QString, bool> fileUsed;
-    QHash<QString, DepenNode*> tmpDepenNodes_;
 };
 
 #endif // DEPENMANAGER_H

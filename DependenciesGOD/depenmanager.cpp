@@ -3,9 +3,7 @@
 #include "filesmanager.h"
 
 #include <QDebug>
-
-#define COLOR_PROJECT_FILE "#FF00FF"
-#define COLOR_EXTERNAL_FILE "#808000"
+#include <QFileInfo>
 
 DepenManager::DepenManager(FilesManager* filesManager)
 {
@@ -46,15 +44,19 @@ void DepenManager::buildTree(){
     }
 
     //Prints the resulting tree
-    QStringList keys = tmpDepenNodes_.keys();
-    for(const QString& key : keys){
-        QDebug dbg(QtDebugMsg);
-        printTree(tmpDepenNodes_[key], dbg, 0);
-    }
+//    QStringList keys = tmpDepenNodes_.keys();
+//    for(const QString& key : keys){
+//        QDebug dbg(QtDebugMsg);
+//        printTree(tmpDepenNodes_[key], dbg, 0);
+//    }
 
     //TODO remove later
-    treeOfDepen = tmpDepenNodes_["mainwindow.h"];
-    regroupExternalDepen(treeOfDepen);
+//    treeOfDepen = tmpDepenNodes_["mainwindow.h"];
+//    regroupExternalDepen(treeOfDepen);
+
+    foreach(DepenNode* node, tmpDepenNodes_){
+        regroupExternalDepen(node);
+    }
 
     bool test = false;
 }
@@ -83,10 +85,29 @@ void DepenManager::makeDepen(DepenNode* node){
 
 void DepenManager::regroupExternalDepen(DepenNode* node){
     DepenNode* externDepenNode = nullptr;
+    if(node->depenName_ == "ios_exception_minidump_generator.h"){
+        bool test = false;
+    }
     for(int i = 0; i < node->childDepen_.size(); i++){
-        if(filesManager_->files_.find(node->childDepen_[i]->depenName_) != filesManager_->files_.end()){
-            regroupExternalDepen(node->childDepen_[i]);
-            continue;
+//        if(node->childDepen_[i]->depenName_ == "ios_exception_minidump_generator.h"){
+//            bool test = false;
+//        }
+        QString fileName = QFileInfo(node->childDepen_[i]->depenName_).fileName();
+        bool dependencyByLocalPath = false;
+        if(fileName != node->childDepen_[i]->depenName_){
+            dependencyByLocalPath = true;
+        }
+        auto fileDataIt = filesManager_->files_.find(fileName);
+        if(fileDataIt != filesManager_->files_.end() && fileDataIt->second->getFilePath().contains(node->childDepen_[i]->depenName_)){
+//            if(dependencyByLocalPath)
+//                if(!fileDataIt->second->getFilePath().contains(node->childDepen_[i]->depenName_)){
+//                    regroupExternalDepen(node->childDepen_[i]);
+//                    continue;
+//                }
+//            }else{
+                regroupExternalDepen(node->childDepen_[i]);
+                continue;
+//            }
         }
         if(externDepenNode == nullptr){
             externDepenNode = new DepenNode(node->childDepen_[i]->depenName_, COLOR_EXTERNAL_FILE);

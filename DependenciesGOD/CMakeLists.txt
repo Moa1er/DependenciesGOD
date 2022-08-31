@@ -29,6 +29,7 @@ set(PROJECT_SOURCES
         scribblearea.cpp
         depennode.h
         depennode.cpp
+        depennodeui.h
         depenmanager.h
         depenmanager.cpp
         drawingManager.h

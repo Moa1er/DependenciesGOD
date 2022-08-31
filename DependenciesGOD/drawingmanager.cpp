@@ -6,59 +6,83 @@ DrawingManager::DrawingManager(Ui::MainWindow* ui)
     ui->graphicsView->setScene(scene_);
 }
 
-void DrawingManager::drawTree(DepenNode* tree, int yDrawing, int xDrawing){
+int DrawingManager::drawTree(DepenNode* tree, int yDrawing, int xDrawing){
+    const int widthTextNode = (new QGraphicsTextItem(tree->depenName_))->sceneBoundingRect().width();
+    const int parentX = xDrawing;
+    xDrawing -= widthTextNode/2;
     uiNodes_.push_back(new DepenNodeUi(scene_, tree, yDrawing, xDrawing));
     yDrawing += 100;
-    const int parentX = xDrawing;
-    const int paddingBetNodes = 100;
+    const int paddingBetNodes = 20;
+    const int paddingDrawing = 5;
     const int nbChildNode = tree->childDepen_.size();
     const int anchorPointXParent = uiNodes_[uiNodes_.size() - 1]->anchorPointX_;
     const int anchorPointYParent = uiNodes_[uiNodes_.size() - 1]->anchorPointY_;
     QVector<int> widthChildren;
     for(int i = 0; i < nbChildNode; i++){
         widthChildren.push_back(findWidthTree(tree->childDepen_[i]));
-        if(tree->depenName_ == "level0"){
-            qDebug() << "child: " << findWidthTree(tree->childDepen_[i]);
-        }
     }
     int widthNode = std::accumulate(widthChildren.begin(), widthChildren.end(), 0);
-    if(tree->depenName_ == "level0"){
-        qDebug() << "sum_of_elems: " << widthNode;
+    if(widthNode < widthTextNode){
+        widthNode = widthTextNode + 2*paddingDrawing;
     }
 
-    int lastXPos = -widthNode/2 + xDrawing;
+    int lastXPos = -widthNode/2 + parentX;
+
+    drawBounderiesTree(lastXPos, yDrawing, widthNode);
+
     for(int i = 0; i < nbChildNode; i++){
-       xDrawing = lastXPos + widthChildren[i]/2;
-       lastXPos += widthChildren[i];
+        //if there is only one child we position at same place as parent
+        if(nbChildNode == 1){
+            xDrawing = parentX;
+        }else{
+            xDrawing = lastXPos + widthChildren[i]/2;
+        }
+
+       lastXPos += widthChildren[i] + paddingBetNodes;
 
        drawTree(tree->childDepen_[i], yDrawing, xDrawing);
-       const int paddingDrawing = 5;
        //gets the x coordonate by getting the width/2 of the printed name
-       const int anchorPointXChild = xDrawing + (new QGraphicsTextItem(tree->childDepen_[i]->depenName_))->sceneBoundingRect().width()/2;
+       const int anchorPointXChild = xDrawing;
        const int anchorPointYChild = yDrawing - paddingDrawing;
-       QPen outlinePen(Qt::black);
-       outlinePen.setWidth(2);
-       scene_->addLine(anchorPointXParent, anchorPointYParent,
-                       anchorPointXChild, anchorPointYChild, outlinePen);
+       drawLine(anchorPointXParent, anchorPointYParent,
+                anchorPointXChild, anchorPointYChild, Qt::black);
     }
+
+    return yDrawing;
 }
 
 int DrawingManager::findWidthTree(DepenNode* tree){
-    const int paddingBetNodes = 40;
+    const int paddingDrawing = 5;
     const int nbChildNode = tree->childDepen_.size();
     int sumWidth = 0;
     for(int i = 0; i < nbChildNode; i++){
         sumWidth += findWidthTree(tree->childDepen_[i]);
-        sumWidth += (new QGraphicsTextItem(tree->childDepen_[i]->depenName_))->sceneBoundingRect().width();
-        if(i > 0){
-            sumWidth += paddingBetNodes;
-        }
     }
-
     //checking in case we there is no child
     int widthNodeInItself = (new QGraphicsTextItem(tree->depenName_))->sceneBoundingRect().width();
     if(sumWidth < widthNodeInItself){
-        sumWidth = widthNodeInItself + paddingBetNodes;
+        sumWidth = widthNodeInItself;
     }
+    sumWidth += 2*paddingDrawing;
     return sumWidth;
+}
+
+//mainly a function for debug
+float currentHue = 0.0;
+void DrawingManager::drawBounderiesTree(int startX, int startY, int widthTree){
+    QColor rdmColor = QColor::fromHslF(currentHue, 1.0, 0.5);
+    currentHue += 0.618033988749895f;
+    currentHue = std::fmod(currentHue, 1.0f);
+
+    const int paddingOneLevel = 100;
+    //first line left
+    drawLine(startX, startY - paddingOneLevel, startX, startY, rdmColor);
+    //second line right
+    drawLine(startX + widthTree, startY - paddingOneLevel, startX + widthTree, startY, rdmColor);
+}
+
+void DrawingManager::drawLine(int x1, int y1, int x2, int y2, QColor color){
+    QPen outlinePen(color);
+    outlinePen.setWidth(2);
+    scene_->addLine(x1, y1, x2, y2, outlinePen);
 }

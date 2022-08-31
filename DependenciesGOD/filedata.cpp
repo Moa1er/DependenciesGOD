@@ -2,6 +2,7 @@
 
 #include <QFile>
 #include <QDebug>
+#include <QFileInfo>
 
 FileData::FileData(QString filePath)
 {
@@ -15,6 +16,7 @@ void FileData::findDependencies(){
         qDebug() << "fileNotOpen in FileData::findDependencies()";
         return;
     }
+    QString fileName = QFileInfo(filePath_).fileName();
     QString lineRead = "";
     //while we didn't find any include we continue to read until the end
     while(!lineRead.contains("#include") && !file.atEnd()){
@@ -31,7 +33,7 @@ void FileData::findDependencies(){
         }
 
         QString dependency = extractDependencyFromStr(lineRead);
-        if(dependency != ""){
+        if(dependency != "" && fileName != dependency){
             fileDependencies_.append(dependency);
         }
         lineRead = file.readLine();
