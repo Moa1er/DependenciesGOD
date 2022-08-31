@@ -29,18 +29,18 @@ void DepenManager::buildTree(){
     //we fill up the map fileUsed to not have undefined values
     //TODO kind of a waste of time maybe try to do that differently
     for(auto const& [key, val] : filesManager_->files_){
-        if(key.contains(".cpp")){
-            continue;
-        }
-        fileUsed[key] = false;
+//        if(key.contains(".cpp")){
+//            continue;
+//        }
+        fileUsed_[key] = false;
     }
 
     for(auto const& [key, val] : filesManager_->files_){
-        if(fileUsed[key] || key.contains(".cpp")){
+        if(fileUsed_[key] /*|| key.contains(".cpp")*/){
             continue;
         }
-        tmpDepenNodes_[key] = new DepenNode(key, false, QColor(COLOR_PROJECT_FILE));
-        makeDepen(tmpDepenNodes_[key]);
+        partialDepenNodes_[key] = new DepenNode(key, false, QColor(COLOR_PROJECT_FILE));
+        makeDepen(partialDepenNodes_[key]);
     }
 
     //Prints the resulting tree
@@ -51,13 +51,13 @@ void DepenManager::buildTree(){
 //    }
 
     //TODO remove later
-//    treeOfDepen = tmpDepenNodes_["C:/Github/LabeoTechGithubs/AwakeQt/mainwindow.h"];
-//    regroupExternalDepen(treeOfDepen);
+    treeOfDepen_ = partialDepenNodes_["C:/Github/LabeoTechGithubs/AwakeQt/mainwindow.h"];
+    regroupExternalDepen(treeOfDepen_);
 
 //    treeOfDepen = tmpDepenNodes_["C:/Github/LabeoTechGithubs/AwakeQt/qt-breakpad/breakpad/src/processor/stackwalker_arm.h"];
 //    regroupExternalDepen(treeOfDepen);
 
-    foreach(DepenNode* node, tmpDepenNodes_){
+    foreach(DepenNode* node, partialDepenNodes_){
         regroupExternalDepen(node);
     }
 
@@ -69,8 +69,8 @@ void DepenManager::makeDepen(DepenNode* node){
         return;
     }
     QStringList dependencies = filesManager_->files_[node->depenName_]->getDependencies();
-    fileUsed[node->depenName_] = true;
-    const QStringList fileUsedKeys = fileUsed.keys();
+    fileUsed_[node->depenName_] = true;
+    const QStringList fileUsedKeys = fileUsed_.keys();
     for(int i = 0; i < dependencies.size(); i++){
         QVector<QString> pathfilesSameName;
         for(int j = 0; j < fileUsedKeys.size(); j++){
@@ -96,13 +96,13 @@ void DepenManager::makeDepen(DepenNode* node){
             }
         }
         if(fileUsedKeys.contains(actualDepenFullPath)){
-            if(fileUsed[actualDepenFullPath]){
+            if(fileUsed_[actualDepenFullPath]){
                 //we get the node that has already been created
                 //we add it as a depen to the node we are processing
                 node->childDepen_.push_back(getNodeAlrdyProcessed(actualDepenFullPath));
                 //If the node was in the map of the tmpDepenNodes then we erase it from the map
-                if(tmpDepenNodes_.contains(actualDepenFullPath)){
-                    tmpDepenNodes_.remove(actualDepenFullPath);
+                if(partialDepenNodes_.contains(actualDepenFullPath)){
+                    partialDepenNodes_.remove(actualDepenFullPath);
                 }
                 continue;
             }
@@ -116,10 +116,10 @@ void DepenManager::makeDepen(DepenNode* node){
 }
 
 void DepenManager::regroupExternalDepen(DepenNode* node){
-    DepenNode* externDepenNode = nullptr;
-    if(node->depenName_ == "ios_exception_minidump_generator.h"){
-        bool test = false;
+    if(node == nullptr){
+        return;
     }
+    DepenNode* externDepenNode = nullptr;
     for(int i = 0; i < node->childDepen_.size(); i++){
         if(!node->childDepen_[i]->isExternDepen_){
             regroupExternalDepen(node->childDepen_[i]);
@@ -140,10 +140,10 @@ void DepenManager::regroupExternalDepen(DepenNode* node){
 }
 
 DepenNode* DepenManager::getNodeAlrdyProcessed(QString nodeToFind){
-    QStringList keys = tmpDepenNodes_.keys();
+    QStringList keys = partialDepenNodes_.keys();
     DepenNode* node = nullptr;
     for(const QString& key : keys){
-        node = findNode(nodeToFind, tmpDepenNodes_[key]);
+        node = findNode(nodeToFind, partialDepenNodes_[key]);
         if(node != nullptr){
             return node;
         }
@@ -152,6 +152,10 @@ DepenNode* DepenManager::getNodeAlrdyProcessed(QString nodeToFind){
 }
 
 DepenNode* DepenManager::findNode(QString nodeToFind, DepenNode* rootNode){
+    if(rootNode == nullptr){
+        return nullptr;
+    }
+
     if(rootNode->depenName_ == nodeToFind){
         return rootNode;
     }

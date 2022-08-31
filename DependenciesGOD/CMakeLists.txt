@@ -25,8 +25,6 @@ set(PROJECT_SOURCES
         filesmanager.cpp
         filedata.h
         filedata.cpp
-        scribblearea.h
-        scribblearea.cpp
         depennode.h
         depennode.cpp
         depennodeui.h

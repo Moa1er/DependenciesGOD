@@ -7,6 +7,10 @@ DrawingManager::DrawingManager(Ui::MainWindow* ui)
 }
 
 int DrawingManager::drawTree(DepenNode* tree, int yDrawing, int xDrawing){
+    if(tree == nullptr){
+        return -1;
+    }
+
     QString fileName = QFileInfo(tree->depenName_).fileName();
     const int widthTextNode = (new QGraphicsTextItem(fileName))->sceneBoundingRect().width();
     const int parentX = xDrawing;
@@ -30,7 +34,7 @@ int DrawingManager::drawTree(DepenNode* tree, int yDrawing, int xDrawing){
 
     int lastXPos = -widthNode/2 + parentX;
 
-    drawBounderiesTree(lastXPos, yDrawing, widthNode);
+//    drawBounderiesTree(lastXPos, yDrawing, widthNode);
 
     for(int i = 0; i < nbChildNode; i++){
         //if there is only one child we position at same place as parent
@@ -54,9 +58,6 @@ int DrawingManager::drawTree(DepenNode* tree, int yDrawing, int xDrawing){
 }
 
 int DrawingManager::findWidthTree(DepenNode* tree){
-//    if(tree->depenName_.contains("minidump_format.h")){
-//        bool test = false;
-//    }
     const int paddingDrawing = 5;
     const int nbChildNode = tree->childDepen_.size();
     int sumWidth = 0;
@@ -101,4 +102,15 @@ void DrawingManager::drawLine(int x1, int y1, int x2, int y2, QColor color){
     QPen outlinePen(color);
     outlinePen.setWidth(2);
     scene_->addLine(x1, y1, x2, y2, outlinePen);
+}
+
+void DrawingManager::saveScene(const QString &fileName, const char *fileFormat){
+    scene_->clearSelection();                                                   // Selections would also render to the file
+    scene_->setSceneRect(scene_->itemsBoundingRect());                          // Re-shrink the scene to it's bounding contents
+    QImage image(scene_->sceneRect().size().toSize(), QImage::Format_ARGB32);   // Create the image with the exact size of the shrunk scene
+    image.fill(Qt::transparent);                                                // Start all pixels transparent
+
+    QPainter painter(&image);
+    scene_->render(&painter);
+    image.save(fileName, fileFormat);
 }

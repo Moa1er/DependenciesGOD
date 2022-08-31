@@ -34,9 +34,6 @@ void FileData::findDependencies(){
 
         QString dependency = extractDependencyFromStr(lineRead);
         if(dependency != "" && fileName != dependency){
-            if(dependency.contains("client_info.h")){
-                bool test = true;
-            }
             fileDependencies_.append(dependency);
         }
         lineRead = file.readLine();

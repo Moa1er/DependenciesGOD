@@ -11,25 +11,28 @@
 
 class DepenManager
 {
+//METHODS
 public:
     DepenManager(FilesManager* fileManager);
     void buildTree();
-public:
-    DepenNode* treeOfDepen;
-    QHash<QString, DepenNode*> tmpDepenNodes_;
+    DepenNode* getNodeAlrdyProcessed(QString nodeToFind);
 private:
     void makeDepen(DepenNode* node);
     void regroupExternalDepen(DepenNode* node);
-    DepenNode* getNodeAlrdyProcessed(QString nodeToFind);
     DepenNode* findNode(QString nodeToFind, DepenNode* rootNode);
 
     //functions to print in terminal
     void printTree(DepenNode* nodeToPrint, QDebug &dbg,
                    int nbTab);
     void printTab(QDebug &dbg, int nbTab);
+//ATTRIBUTES
+public:
+    //useful for debug
+    DepenNode* treeOfDepen_;
+    QHash<QString, DepenNode*> partialDepenNodes_;
 private:
     FilesManager* filesManager_;
-    QHash<QString, bool> fileUsed;
+    QHash<QString, bool> fileUsed_;
 };
 
 #endif // DEPENMANAGER_H
