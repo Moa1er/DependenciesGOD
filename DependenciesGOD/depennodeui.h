@@ -6,6 +6,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
 
+#include <QFileInfo>
+
 class DepenNodeUi
 {
 public:
@@ -14,7 +16,8 @@ public:
         QPen outlinePen(Qt::black);
         outlinePen.setWidth(2);
 
-        nameDepen_ = new QGraphicsTextItem(node->depenName_);
+        QString fileName = QFileInfo(node->depenName_).fileName();
+        nameDepen_ = new QGraphicsTextItem(fileName);
         nameDepen_->setPos(x, y);
         nameDepen_->setZValue(1);
         scene->addItem(nameDepen_);

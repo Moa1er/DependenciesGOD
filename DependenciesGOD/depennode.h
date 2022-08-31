@@ -7,12 +7,13 @@
 class DepenNode
 {
 public:
-    DepenNode(QString depenName, QColor colorOnGraph);
+    DepenNode(QString depenName, bool isExternDepen, QColor colorOnGraph);
     void setDepenName(QString newDepenName){depenName_ = newDepenName;};
 public:
     QString depenName_;
     QVector<DepenNode*> childDepen_;
     QColor colorOnGraph_;
+    bool isExternDepen_;
 };
 
 #endif // DEPENNODE_H

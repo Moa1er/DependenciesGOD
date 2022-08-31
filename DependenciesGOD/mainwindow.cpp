@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    QString dirWithFiles2 = QFileDialog::getExistingDirectory(this, tr("Select Directory"));
     QString dirWithFiles3 = "C:/Github/LabeoTechGithubs/AwakeQt";
     QString dirWithFiles4 = "C:/Github/DependenciesGOD/DependenciesGOD";
+    filesManager.dirWithFiles_ = dirWithFiles3;
     filesManager.addFilesAndInit(dirWithFiles3);
     depenManager.buildTree();
 
@@ -60,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
     int lastGraphY = 0;
     foreach(DepenNode* node, depenManager.tmpDepenNodes_){
         drawingManager->drawTree(node, lastGraphY, 0);
-        lastGraphY += 500;
+        lastGraphY += 1000;
     }
 }
 

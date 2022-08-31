@@ -7,7 +7,8 @@ DrawingManager::DrawingManager(Ui::MainWindow* ui)
 }
 
 int DrawingManager::drawTree(DepenNode* tree, int yDrawing, int xDrawing){
-    const int widthTextNode = (new QGraphicsTextItem(tree->depenName_))->sceneBoundingRect().width();
+    QString fileName = QFileInfo(tree->depenName_).fileName();
+    const int widthTextNode = (new QGraphicsTextItem(fileName))->sceneBoundingRect().width();
     const int parentX = xDrawing;
     xDrawing -= widthTextNode/2;
     uiNodes_.push_back(new DepenNodeUi(scene_, tree, yDrawing, xDrawing));
@@ -22,7 +23,8 @@ int DrawingManager::drawTree(DepenNode* tree, int yDrawing, int xDrawing){
         widthChildren.push_back(findWidthTree(tree->childDepen_[i]));
     }
     int widthNode = std::accumulate(widthChildren.begin(), widthChildren.end(), 0);
-    if(widthNode < widthTextNode){
+    widthNode += (nbChildNode - 1) * 20;
+    if(widthNode < widthTextNode + 2*paddingDrawing){
         widthNode = widthTextNode + 2*paddingDrawing;
     }
 
@@ -52,6 +54,9 @@ int DrawingManager::drawTree(DepenNode* tree, int yDrawing, int xDrawing){
 }
 
 int DrawingManager::findWidthTree(DepenNode* tree){
+//    if(tree->depenName_.contains("minidump_format.h")){
+//        bool test = false;
+//    }
     const int paddingDrawing = 5;
     const int nbChildNode = tree->childDepen_.size();
     int sumWidth = 0;
@@ -59,9 +64,14 @@ int DrawingManager::findWidthTree(DepenNode* tree){
         sumWidth += findWidthTree(tree->childDepen_[i]);
     }
     //checking in case we there is no child
-    int widthNodeInItself = (new QGraphicsTextItem(tree->depenName_))->sceneBoundingRect().width();
+    QString fileName = QFileInfo(tree->depenName_).fileName();
+    int widthNodeInItself = (new QGraphicsTextItem(fileName))->sceneBoundingRect().width();
     if(sumWidth < widthNodeInItself){
         sumWidth = widthNodeInItself;
+    }
+    if(nbChildNode > 0){
+        //adds the sum of padding beetween each node to general width of tree
+        sumWidth += (nbChildNode - 1) * 20;
     }
     sumWidth += 2*paddingDrawing;
     return sumWidth;
@@ -77,6 +87,12 @@ void DrawingManager::drawBounderiesTree(int startX, int startY, int widthTree){
     const int paddingOneLevel = 100;
     //first line left
     drawLine(startX, startY - paddingOneLevel, startX, startY, rdmColor);
+
+    //add text for width debug
+    QGraphicsTextItem *item = new QGraphicsTextItem(QString::number(widthTree));
+    item->setPos(startX + 2, startY - paddingOneLevel/2);
+    scene_->addItem(item);
+
     //second line right
     drawLine(startX + widthTree, startY - paddingOneLevel, startX + widthTree, startY, rdmColor);
 }

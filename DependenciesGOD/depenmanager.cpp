@@ -39,7 +39,7 @@ void DepenManager::buildTree(){
         if(fileUsed[key] || key.contains(".cpp")){
             continue;
         }
-        tmpDepenNodes_[key] = new DepenNode(key, QColor(COLOR_PROJECT_FILE));
+        tmpDepenNodes_[key] = new DepenNode(key, false, QColor(COLOR_PROJECT_FILE));
         makeDepen(tmpDepenNodes_[key]);
     }
 
@@ -51,7 +51,10 @@ void DepenManager::buildTree(){
 //    }
 
     //TODO remove later
-//    treeOfDepen = tmpDepenNodes_["mainwindow.h"];
+//    treeOfDepen = tmpDepenNodes_["C:/Github/LabeoTechGithubs/AwakeQt/mainwindow.h"];
+//    regroupExternalDepen(treeOfDepen);
+
+//    treeOfDepen = tmpDepenNodes_["C:/Github/LabeoTechGithubs/AwakeQt/qt-breakpad/breakpad/src/processor/stackwalker_arm.h"];
 //    regroupExternalDepen(treeOfDepen);
 
     foreach(DepenNode* node, tmpDepenNodes_){
@@ -67,19 +70,48 @@ void DepenManager::makeDepen(DepenNode* node){
     }
     QStringList dependencies = filesManager_->files_[node->depenName_]->getDependencies();
     fileUsed[node->depenName_] = true;
+    const QStringList fileUsedKeys = fileUsed.keys();
     for(int i = 0; i < dependencies.size(); i++){
-        if(fileUsed[dependencies[i]]){
-            //we get the node that has already been created
-            //we add it as a depen to the node we are processing
-            node->childDepen_.push_back(getNodeAlrdyProcessed(dependencies[i]));
-            //If the node was in the map of the tmpDepenNodes then we erase it from the map
-            if(tmpDepenNodes_.contains(dependencies[i])){
-                tmpDepenNodes_.remove(dependencies[i]);
+        QVector<QString> pathfilesSameName;
+        for(int j = 0; j < fileUsedKeys.size(); j++){
+            //TODO bug where fileUsedKeys has some dependencies with no path..
+            //this is a temporary fix:
+            if(fileUsedKeys[j] == dependencies[i] || !fileUsedKeys[j].contains(filesManager_->dirWithFiles_)){
+                continue;
             }
-            continue;
+            QString fileNameFromFilePath = QFileInfo(fileUsedKeys[j]).fileName();
+            QString fileNameFromDepen = QFileInfo(dependencies[i]).fileName();
+            if(fileNameFromFilePath == fileNameFromDepen){
+                pathfilesSameName.push_back(fileUsedKeys[j]);
+            }
         }
-        node->childDepen_.push_back(new DepenNode(dependencies[i], QColor(COLOR_PROJECT_FILE)));
-        makeDepen(node->childDepen_[node->childDepen_.size() - 1]);
+        if(pathfilesSameName.size() > 1){
+            bool test = false;
+        }
+        QString actualDepenFullPath = "";
+        for(int j = 0; j < pathfilesSameName.size(); j++){
+            if(pathfilesSameName[j].contains(dependencies[i])){
+                actualDepenFullPath = pathfilesSameName[j];
+                break;
+            }
+        }
+        if(fileUsedKeys.contains(actualDepenFullPath)){
+            if(fileUsed[actualDepenFullPath]){
+                //we get the node that has already been created
+                //we add it as a depen to the node we are processing
+                node->childDepen_.push_back(getNodeAlrdyProcessed(actualDepenFullPath));
+                //If the node was in the map of the tmpDepenNodes then we erase it from the map
+                if(tmpDepenNodes_.contains(actualDepenFullPath)){
+                    tmpDepenNodes_.remove(actualDepenFullPath);
+                }
+                continue;
+            }
+            node->childDepen_.push_back(new DepenNode(actualDepenFullPath, false, QColor(COLOR_PROJECT_FILE)));
+            makeDepen(node->childDepen_[node->childDepen_.size() - 1]);
+        }else{
+            node->childDepen_.push_back(new DepenNode(dependencies[i], true, QColor(COLOR_PROJECT_FILE)));
+            makeDepen(node->childDepen_[node->childDepen_.size() - 1]);
+        }
     }
 }
 
@@ -89,28 +121,12 @@ void DepenManager::regroupExternalDepen(DepenNode* node){
         bool test = false;
     }
     for(int i = 0; i < node->childDepen_.size(); i++){
-//        if(node->childDepen_[i]->depenName_ == "ios_exception_minidump_generator.h"){
-//            bool test = false;
-//        }
-        QString fileName = QFileInfo(node->childDepen_[i]->depenName_).fileName();
-        bool dependencyByLocalPath = false;
-        if(fileName != node->childDepen_[i]->depenName_){
-            dependencyByLocalPath = true;
-        }
-        auto fileDataIt = filesManager_->files_.find(fileName);
-        if(fileDataIt != filesManager_->files_.end() && fileDataIt->second->getFilePath().contains(node->childDepen_[i]->depenName_)){
-//            if(dependencyByLocalPath)
-//                if(!fileDataIt->second->getFilePath().contains(node->childDepen_[i]->depenName_)){
-//                    regroupExternalDepen(node->childDepen_[i]);
-//                    continue;
-//                }
-//            }else{
-                regroupExternalDepen(node->childDepen_[i]);
-                continue;
-//            }
+        if(!node->childDepen_[i]->isExternDepen_){
+            regroupExternalDepen(node->childDepen_[i]);
+            continue;
         }
         if(externDepenNode == nullptr){
-            externDepenNode = new DepenNode(node->childDepen_[i]->depenName_, COLOR_EXTERNAL_FILE);
+            externDepenNode = new DepenNode(node->childDepen_[i]->depenName_, true, COLOR_EXTERNAL_FILE);
         }else{
             externDepenNode->setDepenName(externDepenNode->depenName_ + "\n" + node->childDepen_[i]->depenName_);
         }
