@@ -16,10 +16,10 @@ private:
      QString extractDependencyFromStr(QString lineRead);
 //ATTRIBUTES
 public:
-
+    QList<bool> isExternDepen_;
 private:
-     QString filePath_;
-     QStringList fileDependencies_;
+    QString filePath_;
+    QStringList fileDependencies_;
 };
 
 #endif // FILEDATA_H

@@ -83,7 +83,6 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 void MainWindow::onCustomContextMenu(const QPoint &point){
-    qDebug() << "point is: " << point;
     QModelIndex index = ui->treeView_tw->indexAt(point);
     if (index.isValid()) {
         QString fileName = treeViewElements.itemFromIndex(index)->text();
@@ -178,7 +177,7 @@ void MainWindow::createMenus(){
 }
 
 void MainWindow::saveFile(){
-    QString fileName = QFileDialog::getSaveFileName(this, "Save image", QCoreApplication::applicationDirPath(), "BMP Files (*.bmp);;JPEG (*.JPEG);;PNG (*.png)" );
+    QString fileName = QFileDialog::getSaveFileName(this, "Save graph", QCoreApplication::applicationDirPath(), "BMP Files (*.bmp);;JPEG (*.JPEG);;PNG (*.png)" );
     if (!fileName.isNull()){
         QPixmap pixMap = this->ui->graphicsView->grab();
         pixMap.save(fileName, nullptr, 100);

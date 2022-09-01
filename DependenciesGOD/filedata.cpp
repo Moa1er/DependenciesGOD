@@ -35,6 +35,8 @@ void FileData::findDependencies(){
         QString dependency = extractDependencyFromStr(lineRead);
         if(dependency != "" && fileName != dependency){
             fileDependencies_.append(dependency);
+        }else{
+            isExternDepen_.removeLast();
         }
         lineRead = file.readLine();
     }
@@ -51,6 +53,11 @@ QString FileData::extractDependencyFromStr(QString lineRead){
     }
 
     //Gets read of the "" or the <> around the dependency
+    if(lineRead[0] == '<'){
+        isExternDepen_.append(true);
+    }else{
+        isExternDepen_.append(false);
+    }
     lineRead.remove(0, 1);
     lineRead.remove(lineRead.size()-1, 1);
 

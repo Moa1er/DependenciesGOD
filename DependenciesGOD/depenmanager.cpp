@@ -29,14 +29,11 @@ void DepenManager::buildTree(){
     //we fill up the map fileUsed to not have undefined values
     //TODO kind of a waste of time maybe try to do that differently
     for(auto const& [key, val] : filesManager_->files_){
-//        if(key.contains(".cpp")){
-//            continue;
-//        }
         fileUsed_[key] = false;
     }
 
     for(auto const& [key, val] : filesManager_->files_){
-        if(fileUsed_[key] /*|| key.contains(".cpp")*/){
+        if(fileUsed_[key]){
             continue;
         }
         partialDepenNodes_[key] = new DepenNode(key, false, QColor(COLOR_PROJECT_FILE));
@@ -95,7 +92,11 @@ void DepenManager::makeDepen(DepenNode* node){
                 break;
             }
         }
-        if(fileUsedKeys.contains(actualDepenFullPath)){
+        if(node->depenName_ == "C:/Github/ioi_acq/eventslistdialog.h"){
+            QList<bool> test = filesManager_->files_[node->depenName_]->isExternDepen_;
+
+        }
+        if(fileUsedKeys.contains(actualDepenFullPath) && !filesManager_->files_[node->depenName_]->isExternDepen_[i]){
             if(fileUsed_[actualDepenFullPath]){
                 //we get the node that has already been created
                 //we add it as a depen to the node we are processing
@@ -152,7 +153,7 @@ DepenNode* DepenManager::getNodeAlrdyProcessed(QString nodeToFind){
 }
 
 DepenNode* DepenManager::findNode(QString nodeToFind, DepenNode* rootNode){
-    if(rootNode == nullptr){
+    if(rootNode == nullptr || rootNode->isExternDepen_){
         return nullptr;
     }
 
