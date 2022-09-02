@@ -1,4 +1,4 @@
-# DependenciesGOD
+# DependenciesGOD (WORK IN PROGRESS)
 An qt based app that creates a graph of the dependencies for c/c++ projects
 
 ## Getting started
@@ -9,3 +9,6 @@ An qt based app that creates a graph of the dependencies for c/c++ projects
 1.  Drag and drop the folder of your c/c++ projet anywhere on the app or go into File->Open Project and choose the folder of your projet.
 2.  On your left you will have a tree of each .h/.hpp or .c/.cpp in your project. Right click on one of them and click on 'Show graph'
 3.  A graph will appear on your screen. If you want to save it to a jpeg/bmp/png file go into File->Save current graph as
+
+## Do you have an issue or an idea for the app ?
+Create and issue on github and I will look at it !
