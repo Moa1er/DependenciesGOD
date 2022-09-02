@@ -29,11 +29,11 @@ void DepenManager::buildTree(){
     //we fill up the map fileUsed to not have undefined values
     //TODO kind of a waste of time maybe try to do that differently
     for(auto const& [key, val] : filesManager_->files_){
-        fileUsed_[key] = false;
+        fileProcessed_[key] = false;
     }
 
     for(auto const& [key, val] : filesManager_->files_){
-        if(fileUsed_[key]){
+        if(fileProcessed_[key]){
             continue;
         }
         partialDepenNodes_[key] = new DepenNode(key, false, QColor(COLOR_PROJECT_FILE));
@@ -62,70 +62,89 @@ void DepenManager::buildTree(){
 }
 
 void DepenManager::makeDepen(DepenNode* node){
+    if(node == nullptr){
+        qDebug() << "node nullptr in DepenManager::makeDepen";
+        return;
+    }
+    //if node externalDepen then we don't want to process the depen
     if(filesManager_->files_.find(node->depenName_) == filesManager_->files_.end()){
         return;
     }
-
+    fileProcessed_[node->depenName_] = true;
     QStringList dependencies = filesManager_->files_[node->depenName_]->getDependencies();
-    fileUsed_[node->depenName_] = true;
-    const QStringList fileUsedKeys = fileUsed_.keys();
+    const QStringList fileUsedKeys = fileProcessed_.keys();
     for(int i = 0; i < dependencies.size(); i++){
-        QVector<QString> pathfilesSameName;
-        for(int j = 0; j < fileUsedKeys.size(); j++){
-            //TODO bug where fileUsedKeys has some dependencies with no path..
-            //this is a temporary fix:
-            if(fileUsedKeys[j] == dependencies[i] || !fileUsedKeys[j].contains(filesManager_->dirWithFiles_)){
-                continue;
-            }
-            QString fileNameFromFilePath = QFileInfo(fileUsedKeys[j]).fileName();
-            QString fileNameFromDepen = QFileInfo(dependencies[i]).fileName();
-            if(fileNameFromFilePath == fileNameFromDepen){
-                pathfilesSameName.push_back(fileUsedKeys[j]);
-            }
-        }
-        if(pathfilesSameName.size() > 1){
-            bool test = false;
-        }
-        QString actualDepenFullPath = "";
-        for(int j = 0; j < pathfilesSameName.size(); j++){
-            if(pathfilesSameName[j].contains(dependencies[i])){
-                actualDepenFullPath = pathfilesSameName[j];
-                break;
-            }
-        }
-        if(node->depenName_ == "C:/Github/ioi_acq/eventslistdialog.h"){
+        QString depenFullPath = findDepenFullPath(dependencies[i]);
+        if(node->depenName_ == "C:/Github/LabeoTechGithubs/AwakeQt/qt-breakpad/breakpad/src/third_party/curl/curl.h"){
             QList<bool> test = filesManager_->files_[node->depenName_]->isExternDepen_;
-
         }
-        if(fileUsedKeys.contains(actualDepenFullPath) && !filesManager_->files_[node->depenName_]->isExternDepen_[i]){
-            if(fileUsed_[actualDepenFullPath]){
+        //if the path is contained in the usedMap and the dependency isn't extern to the project
+        if(fileUsedKeys.contains(depenFullPath) && !filesManager_->files_[node->depenName_]->isExternDepen_[i]){
+            //if the file has already been processed
+            if(fileProcessed_[depenFullPath]){
                 //we get the node that has already been created
                 //we add it as a depen to the node we are processing
-                node->childDepen_.push_back(getNodeAlrdyProcessed(actualDepenFullPath));
+                node->childDepen_.push_back(getNodeAlrdyProcessed(depenFullPath));
                 //If the node was in the map of the tmpDepenNodes then we erase it from the map
-                if(partialDepenNodes_.contains(actualDepenFullPath)){
-                    partialDepenNodes_.remove(actualDepenFullPath);
+                if(partialDepenNodes_.contains(depenFullPath)){
+                    partialDepenNodes_.remove(depenFullPath);
                 }
-                continue;
+            }else{
+                node->childDepen_.push_back(new DepenNode(depenFullPath, false, QColor(COLOR_PROJECT_FILE)));
+                makeDepen(node->childDepen_[node->childDepen_.size() - 1]);
             }
-            node->childDepen_.push_back(new DepenNode(actualDepenFullPath, false, QColor(COLOR_PROJECT_FILE)));
-            makeDepen(node->childDepen_[node->childDepen_.size() - 1]);
         }else{
             node->childDepen_.push_back(new DepenNode(dependencies[i], true, QColor(COLOR_PROJECT_FILE)));
-            makeDepen(node->childDepen_[node->childDepen_.size() - 1]);
         }
     }
 }
 
+QString DepenManager::findDepenFullPath(QString depenName){
+    const QStringList fileUsedKeys = fileProcessed_.keys();
+    QVector<QString> pathfilesSameName;
+    //we get all the paths that contains the ONLY fileName of the dependency
+    for(int j = 0; j < fileUsedKeys.size(); j++){
+        //TODO bug where fileUsedKeys has some dependencies with no path..
+        //this is a temporary fix:
+        if(fileUsedKeys[j] == depenName || !fileUsedKeys[j].contains(filesManager_->dirWithFiles_)){
+            continue;
+        }
+        QString fileNameFromFilePath = QFileInfo(fileUsedKeys[j]).fileName();
+        QString fileNameFromDepen = QFileInfo(depenName).fileName();
+        if(fileNameFromFilePath == fileNameFromDepen){
+            pathfilesSameName.push_back(fileUsedKeys[j]);
+        }
+    }
+    if(pathfilesSameName.size() > 1){
+        bool test = false;
+    }
+
+    QString actualDepenFullPath = "";
+    //we get the supposedly unique path that contains the path AND the fileName of the dependency
+    for(int j = 0; j < pathfilesSameName.size(); j++){
+        if(pathfilesSameName[j].contains(depenName)){
+            actualDepenFullPath = pathfilesSameName[j];
+            break;
+        }
+    }
+    return actualDepenFullPath;
+}
+
 void DepenManager::regroupExternalDepen(DepenNode* node){
     if(node == nullptr){
+        qDebug() << "node nullptr in DepenManager::regroupExternalDepen";
         return;
+    }
+
+    if(node->depenName_ == "C:/Github/LabeoTechGithubs/AwakeQt/qt-breakpad/breakpad/src/third_party/curl/curl.h"){
+        bool test = false;
     }
 
     DepenNode* externDepenNode = nullptr;
     for(int i = 0; i < node->childDepen_.size(); i++){
         //TODO mmmmm yeah sometimes it is nullptr for no apparent reason
         if(node->childDepen_[i] == nullptr){
+            qDebug() << "node CHILDREN nullptr in DepenManager::regroupExternalDepen";
             continue;
         }
         if(!node->childDepen_[i]->isExternDepen_){
@@ -159,7 +178,12 @@ DepenNode* DepenManager::getNodeAlrdyProcessed(QString nodeToFind){
 }
 
 DepenNode* DepenManager::findNode(QString nodeToFind, DepenNode* rootNode){
-    if(rootNode == nullptr || rootNode->isExternDepen_){
+    if(rootNode == nullptr){
+        qDebug() << "node nullptr in DepenManager::findNode";
+        return nullptr;
+    }
+
+    if(rootNode->isExternDepen_){
         return nullptr;
     }
 

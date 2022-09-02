@@ -12,11 +12,20 @@ class DepenNodeUi
 {
 public:
     DepenNodeUi(QGraphicsScene* scene, DepenNode* node, int y, int x){
+        if(node->depenName_ == "foo.h\nstring\nvector\nstdint.h\nsys/types.h\ninttypes.h"){
+            bool test = false;
+        }
         QBrush blueBrush(node->colorOnGraph_);
         QPen outlinePen(Qt::black);
         outlinePen.setWidth(2);
 
-        QString fileName = QFileInfo(node->depenName_).fileName();
+        QString fileName = "";
+        //if the node is external then it doesn't have a path so we take the whole name
+        if(node->isExternDepen_){
+            fileName = node->depenName_;
+        }else{
+            fileName = QFileInfo(node->depenName_).fileName();
+        }
         nameDepen_ = new QGraphicsTextItem(fileName);
         nameDepen_->setPos(x, y);
         nameDepen_->setZValue(1);

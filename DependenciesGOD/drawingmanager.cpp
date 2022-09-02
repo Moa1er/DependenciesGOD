@@ -11,7 +11,12 @@ int DrawingManager::drawTree(DepenNode* tree, int yDrawing, int xDrawing){
         return -1;
     }
 
-    QString fileName = QFileInfo(tree->depenName_).fileName();
+    QString fileName = "";
+    if(tree->isExternDepen_){
+        fileName = tree->depenName_;
+    }else{
+        fileName = QFileInfo(tree->depenName_).fileName();
+    }
     const int widthTextNode = (new QGraphicsTextItem(fileName))->sceneBoundingRect().width();
     const int parentX = xDrawing;
     xDrawing -= widthTextNode/2;
@@ -34,7 +39,7 @@ int DrawingManager::drawTree(DepenNode* tree, int yDrawing, int xDrawing){
 
     int lastXPos = -widthNode/2 + parentX;
 
-//    drawBounderiesTree(lastXPos, yDrawing, widthNode);
+    drawBounderiesTree(lastXPos, yDrawing, widthNode);
 
     for(int i = 0; i < nbChildNode; i++){
         //if there is only one child we position at same place as parent
@@ -68,7 +73,12 @@ int DrawingManager::findWidthTree(DepenNode* tree){
         sumWidth += findWidthTree(tree->childDepen_[i]);
     }
     //checking in case we there is no child
-    QString fileName = QFileInfo(tree->depenName_).fileName();
+    QString fileName = "";
+    if(tree->isExternDepen_){
+        fileName = tree->depenName_;
+    }else{
+        fileName = QFileInfo(tree->depenName_).fileName();
+    }
     int widthNodeInItself = (new QGraphicsTextItem(fileName))->sceneBoundingRect().width();
     if(sumWidth < widthNodeInItself){
         sumWidth = widthNodeInItself;

@@ -19,6 +19,7 @@ public:
 private:
     void makeDepen(DepenNode* node);
     void regroupExternalDepen(DepenNode* node);
+    QString findDepenFullPath(QString depenName);
     DepenNode* findNode(QString nodeToFind, DepenNode* rootNode);
 
     //functions to print in terminal
@@ -32,7 +33,7 @@ public:
     QHash<QString, DepenNode*> partialDepenNodes_;
 private:
     FilesManager* filesManager_;
-    QHash<QString, bool> fileUsed_;
+    QHash<QString, bool> fileProcessed_;
 };
 
 #endif // DEPENMANAGER_H

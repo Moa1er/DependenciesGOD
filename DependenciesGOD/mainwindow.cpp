@@ -30,13 +30,13 @@ MainWindow::MainWindow(QWidget *parent)
     QString dirWithFiles3 = "C:/Github/LabeoTechGithubs/AwakeQt";
     QString dirWithFiles5 = "C:/github/AwakeQt";
 //    QString dirWithFiles4 = "C:/Github/DependenciesGOD/DependenciesGOD";
-    filesManager.dirWithFiles_ = dirWithFiles5;
-    filesManager.addFilesAndInit(dirWithFiles5);
-    depenManager.buildTree();
+//    filesManager.dirWithFiles_ = dirWithFiles3;
+//    filesManager.addFilesAndInit(dirWithFiles3);
+//    depenManager.buildTree();
 
 //    // Create actions and menus
-    createMenus();
-    drawingManager = new DrawingManager(ui);
+//    createMenus();
+//    drawingManager = new DrawingManager(ui);
 ////    drawingManager->drawTree(depenManager.treeOfDepen, 0, 0);
 
 ////    DepenNode* testFindWidth;
@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent)
 //        lastGraphY += 1000;
 //    }
 
-    showGraph("C:/github/AwakeQt/qt-breakpad/breakpad/src/third_party/linux/include/gflags/gflags.h");
+//    showGraph(dirWithFiles3 + "/qt-breakpad/breakpad/src/third_party/linux/include/gflags/gflags.h");
 
 //    setAcceptDrops(true);
 //    ui->centralwidget->setAcceptDrops(true);
@@ -76,13 +76,13 @@ MainWindow::MainWindow(QWidget *parent)
 ///////////////////////////////////////////////////////////////////////////////////
 //    createMenus();
 //    //enabling drop of folder on app
-//    setAcceptDrops(true);
+    setAcceptDrops(true);
 
-//    //useful to create menu on right click to show graph
-//    ui->treeView_tw->setContextMenuPolicy(Qt::CustomContextMenu);
-//    connect(ui->treeView_tw, SIGNAL(customContextMenuRequested(const QPoint &)),
-//            this, SLOT(onCustomContextMenu(const QPoint &)));
-//    processProjectFolder("C:/github/AwakeQt");
+    //useful to create menu on right click to show graph
+    ui->treeView_tw->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treeView_tw, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(onCustomContextMenu(const QPoint &)));
+    processProjectFolder(dirWithFiles3);
 }
 
 void MainWindow::onCustomContextMenu(const QPoint &point){
