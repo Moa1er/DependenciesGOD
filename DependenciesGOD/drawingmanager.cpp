@@ -58,6 +58,9 @@ int DrawingManager::drawTree(DepenNode* tree, int yDrawing, int xDrawing){
 }
 
 int DrawingManager::findWidthTree(DepenNode* tree){
+    if(tree == nullptr){
+        return -1;
+    }
     const int paddingDrawing = 5;
     const int nbChildNode = tree->childDepen_.size();
     int sumWidth = 0;

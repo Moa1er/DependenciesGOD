@@ -27,16 +27,16 @@ MainWindow::MainWindow(QWidget *parent)
 ///////////////////////////////////////////////////////////////////////////////////
 //    QString dirWithFiles = "C:/ProjectsQt/DepenciesGODFilesTest";
 ////    QString dirWithFiles2 = QFileDialog::getExistingDirectory(this, tr("Select Directory"));
-//    QString dirWithFiles3 = "C:/Github/LabeoTechGithubs/AwakeQt";
+    QString dirWithFiles3 = "C:/Github/LabeoTechGithubs/AwakeQt";
+    QString dirWithFiles5 = "C:/github/AwakeQt";
 //    QString dirWithFiles4 = "C:/Github/DependenciesGOD/DependenciesGOD";
-//    filesManager.dirWithFiles_ = dirWithFiles3;
-//    filesManager.addFilesAndInit(dirWithFiles3);
-//    depenManager.buildTree();
+    filesManager.dirWithFiles_ = dirWithFiles5;
+    filesManager.addFilesAndInit(dirWithFiles5);
+    depenManager.buildTree();
 
 //    // Create actions and menus
-//    createActions();
-//    createMenus();
-//    drawingManager = new DrawingManager(ui);
+    createMenus();
+    drawingManager = new DrawingManager(ui);
 ////    drawingManager->drawTree(depenManager.treeOfDepen, 0, 0);
 
 ////    DepenNode* testFindWidth;
@@ -61,10 +61,12 @@ MainWindow::MainWindow(QWidget *parent)
 ////    drawingManager->drawTree(testFindWidth, 400, 0);
 
 //    int lastGraphY = 0;
-//    foreach(DepenNode* node, depenManager.tmpDepenNodes_){
+//    foreach(DepenNode* node, depenManager.partialDepenNodes_){
 //        drawingManager->drawTree(node, lastGraphY, 0);
 //        lastGraphY += 1000;
 //    }
+
+    showGraph("C:/github/AwakeQt/qt-breakpad/breakpad/src/third_party/linux/include/gflags/gflags.h");
 
 //    setAcceptDrops(true);
 //    ui->centralwidget->setAcceptDrops(true);
@@ -72,14 +74,15 @@ MainWindow::MainWindow(QWidget *parent)
 ///////////////////////////////////////////////////////////////////////////////////
 //PART FOR RELEASE
 ///////////////////////////////////////////////////////////////////////////////////
-    createMenus();
-    //enabling drop of folder on app
-    setAcceptDrops(true);
+//    createMenus();
+//    //enabling drop of folder on app
+//    setAcceptDrops(true);
 
-    //useful to create menu on right click to show graph
-    ui->treeView_tw->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->treeView_tw, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(onCustomContextMenu(const QPoint &)));
+//    //useful to create menu on right click to show graph
+//    ui->treeView_tw->setContextMenuPolicy(Qt::CustomContextMenu);
+//    connect(ui->treeView_tw, SIGNAL(customContextMenuRequested(const QPoint &)),
+//            this, SLOT(onCustomContextMenu(const QPoint &)));
+//    processProjectFolder("C:/github/AwakeQt");
 }
 
 void MainWindow::onCustomContextMenu(const QPoint &point){

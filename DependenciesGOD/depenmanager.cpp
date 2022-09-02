@@ -65,6 +65,7 @@ void DepenManager::makeDepen(DepenNode* node){
     if(filesManager_->files_.find(node->depenName_) == filesManager_->files_.end()){
         return;
     }
+
     QStringList dependencies = filesManager_->files_[node->depenName_]->getDependencies();
     fileUsed_[node->depenName_] = true;
     const QStringList fileUsedKeys = fileUsed_.keys();
@@ -120,8 +121,13 @@ void DepenManager::regroupExternalDepen(DepenNode* node){
     if(node == nullptr){
         return;
     }
+
     DepenNode* externDepenNode = nullptr;
     for(int i = 0; i < node->childDepen_.size(); i++){
+        //TODO mmmmm yeah sometimes it is nullptr for no apparent reason
+        if(node->childDepen_[i] == nullptr){
+            continue;
+        }
         if(!node->childDepen_[i]->isExternDepen_){
             regroupExternalDepen(node->childDepen_[i]);
             continue;
