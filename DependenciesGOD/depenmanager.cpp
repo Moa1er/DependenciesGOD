@@ -48,8 +48,8 @@ void DepenManager::buildTree(){
 //    }
 
     //TODO remove later
-    treeOfDepen_ = partialDepenNodes_["C:/Github/LabeoTechGithubs/AwakeQt/mainwindow.h"];
-    regroupExternalDepen(treeOfDepen_);
+//    treeOfDepen_ = partialDepenNodes_["C:/Github/LabeoTechGithubs/AwakeQt/mainwindow.h"];
+//    regroupExternalDepen(treeOfDepen_);
 
 //    treeOfDepen = tmpDepenNodes_["C:/Github/LabeoTechGithubs/AwakeQt/qt-breakpad/breakpad/src/processor/stackwalker_arm.h"];
 //    regroupExternalDepen(treeOfDepen);
@@ -70,12 +70,16 @@ void DepenManager::makeDepen(DepenNode* node){
     if(filesManager_->files_.find(node->depenName_) == filesManager_->files_.end()){
         return;
     }
+    if(node->depenName_ == "C:/github/AwakeQt/qt-breakpad/breakpad/src/third_party/curl/curl.h"){
+        qDebug() << "curl processed";
+    }
     fileProcessed_[node->depenName_] = true;
     QStringList dependencies = filesManager_->files_[node->depenName_]->getDependencies();
     const QStringList fileUsedKeys = fileProcessed_.keys();
+
     for(int i = 0; i < dependencies.size(); i++){
         QString depenFullPath = findDepenFullPath(dependencies[i]);
-        if(node->depenName_ == "C:/Github/LabeoTechGithubs/AwakeQt/qt-breakpad/breakpad/src/third_party/curl/curl.h"){
+        if(node->depenName_ == "C:/github/AwakeQt/qt-breakpad/breakpad/src/third_party/curl/mprintf.h"){
             QList<bool> test = filesManager_->files_[node->depenName_]->isExternDepen_;
         }
         //if the path is contained in the usedMap and the dependency isn't extern to the project
@@ -97,6 +101,7 @@ void DepenManager::makeDepen(DepenNode* node){
             node->childDepen_.push_back(new DepenNode(dependencies[i], true, QColor(COLOR_PROJECT_FILE)));
         }
     }
+    bool end = false;
 }
 
 QString DepenManager::findDepenFullPath(QString depenName){
@@ -136,10 +141,6 @@ void DepenManager::regroupExternalDepen(DepenNode* node){
         return;
     }
 
-    if(node->depenName_ == "C:/Github/LabeoTechGithubs/AwakeQt/qt-breakpad/breakpad/src/third_party/curl/curl.h"){
-        bool test = false;
-    }
-
     DepenNode* externDepenNode = nullptr;
     for(int i = 0; i < node->childDepen_.size(); i++){
         //TODO mmmmm yeah sometimes it is nullptr for no apparent reason
@@ -168,9 +169,15 @@ void DepenManager::regroupExternalDepen(DepenNode* node){
 DepenNode* DepenManager::getNodeAlrdyProcessed(QString nodeToFind){
     QStringList keys = partialDepenNodes_.keys();
     DepenNode* node = nullptr;
+    if(nodeToFind == "C:/github/AwakeQt/qt-breakpad/breakpad/src/third_party/curl/multi.h"){
+        qDebug() << "Separator\n";
+    }
     for(const QString& key : keys){
         node = findNode(nodeToFind, partialDepenNodes_[key]);
         if(node != nullptr){
+            if(nodeToFind == "C:/github/AwakeQt/qt-breakpad/breakpad/src/third_party/curl/multi.h"){
+                qDebug() << "key is: " << key;
+            }
             return node;
         }
     }

@@ -21,15 +21,9 @@ void FileData::findDependencies(){
     }
     QString fileName = QFileInfo(filePath_).fileName();
     QString lineRead = "";
-    //while we didn't find any include we continue to read until the end
-//    while(!lineRead.contains("#include") && !file.atEnd()){
-//        lineRead = file.readLine();
-//    }
-    //if line contains "(" it means we are in a decleration of function
-    //or processing of some sort
-    //This condition means that if we have includes after a "(" it will not find it..
-    //TODO maybe find something else
-    while(/*!lineRead.contains("(") &&*/ !file.atEnd()){
+
+    //TODO maybe some processing to not read all the lines of the file ?
+    while(!file.atEnd()){
         if(!lineRead.contains("#include") || (!lineRead.contains("<") && !lineRead.contains("\""))){
             lineRead = file.readLine();
             continue;
@@ -47,25 +41,6 @@ void FileData::findDependencies(){
 }
 
 QString FileData::extractDependencyFromStr(QString lineRead){
-//    //Gets rid of #include and spaces
-//    lineRead.remove("#include").remove(" ");
-//    //Gets rid of "\n" and "\r"
-//    lineRead.remove("\n").remove("\r");
-//    if(lineRead.size() < 1){
-//        return "";
-//    }
-
-//    //Gets read of the "" or the <> around the dependency
-//    if(lineRead[0] == '<'){
-//        isExternDepen_.append(true);
-//    }else if(lineRead[0] == '\"'){
-//        isExternDepen_.append(false);
-//    }else{
-//        isExternDepen_.append(false);
-//        return "";
-//    }
-//    lineRead.remove("\"").remove("<").remove(">");
-
     int idxInclude = lineRead.indexOf("#include");
     //9 is the number of char in "#include"
     lineRead.remove(0, idxInclude + 8);
@@ -86,11 +61,10 @@ QString FileData::extractDependencyFromStr(QString lineRead){
     int idxEndDepen = -1;
     if(isExternDepen_.last()){
         idxEndDepen = lineRead.indexOf(">", idxStartDepen + 1);
-    }else{
+   }else{
         idxEndDepen = lineRead.indexOf("\"", idxStartDepen + 1);
     }
     lineRead = lineRead.mid(idxStartDepen + 1, idxEndDepen - idxStartDepen - 1);
-
 
     return lineRead;
 }

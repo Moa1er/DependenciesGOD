@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
 ////    QString dirWithFiles2 = QFileDialog::getExistingDirectory(this, tr("Select Directory"));
     QString dirWithFiles3 = "C:/Github/LabeoTechGithubs/AwakeQt";
     QString dirWithFiles5 = "C:/github/AwakeQt";
-//    QString dirWithFiles4 = "C:/Github/DependenciesGOD/DependenciesGOD";
+    QString dirWithFiles4 = "C:/Github/DependenciesGOD/DependenciesGOD";
 //    filesManager.dirWithFiles_ = dirWithFiles3;
 //    filesManager.addFilesAndInit(dirWithFiles3);
 //    depenManager.buildTree();
@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView_tw->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->treeView_tw, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(onCustomContextMenu(const QPoint &)));
-    processProjectFolder(dirWithFiles3);
+    processProjectFolder(dirWithFiles5);
 }
 
 void MainWindow::onCustomContextMenu(const QPoint &point){
