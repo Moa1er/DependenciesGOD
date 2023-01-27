@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView_tw->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->treeView_tw, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(onCustomContextMenu(const QPoint &)));
-    processProjectFolder(dirWithFiles5);
+    processProjectFolder(dirWithFiles3);
 }
 
 void MainWindow::onCustomContextMenu(const QPoint &point){
@@ -145,6 +145,7 @@ void MainWindow::updateTreeView(QString fileName, QStringList& dependencies){
         childItem->setFlags(childItem->flags() & ~Qt::ItemIsEditable);
         rootItem->appendRow(childItem);
     }
+    treeViewElements.sort(0);
     ui->treeView_tw->setModel(&treeViewElements);
     contextMenuTreeView = new QMenu(ui->treeView_tw);
 }
@@ -166,7 +167,6 @@ void MainWindow::createMenus(){
 
 
     //create action for Help menu option
-
     QAction *howUseAppAction = new QAction(tr("&How to use this app ?"), this);
     connect(howUseAppAction, SIGNAL(triggered()), this, SLOT(showHelp()));
 
