@@ -1,4 +1,4 @@
-# DependenciesGOD (WORK IN PROGRESS)
+# DependenciesGOD
 An qt based app that creates a graph of the dependencies for c/c++ projects
 
 ## Getting started
